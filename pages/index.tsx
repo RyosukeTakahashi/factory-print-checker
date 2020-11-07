@@ -1,33 +1,35 @@
 import Head from "next/head";
-import { GetStaticProps } from "next";
-import { getSortedPostsData } from "../lib/posts";
-import Layout, { siteTitle } from "../components/layout";
-import utilStyles from "../styles/utils.module.css";
-import { BlogList } from "../components/BlogList";
+import RefOrInj from "../components/RefOrInj";
+import Squares from "../components/Squares";
+import { AppLayoutGrid, Pane } from "../src/constants";
+import LeftPane from "../components/LeftPane";
 
-export default function Home({
-  allPostsData,
-}: {
-  staticCollection: { name: string }[];
-  allPostsData: { date: string; title: string; id: string }[];
-}) {
+// フォルダ選択
+// 画像反映
+
+// fetcher 記述
+// getserversideprops でcsvを取得
+// machine check result
+// getchoice
+// getrecoveryoptions
+// getDownloadUrlsOfImgInFolder
+//
+
+export default function Home({}: {}) {
   return (
-    <Layout home>
+    <>
       <Head>
-        <title>{siteTitle}</title>
+        <title>{"印刷チェッカー"}</title>
       </Head>
-      <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
-        <BlogList allPosts={allPostsData} />
-      </section>
-    </Layout>
+      <AppLayoutGrid>
+        <LeftPane />
+        <Pane area={"centerPane"}>
+          <main className={"flex justify-around"}>
+            <RefOrInj />
+            <Squares />
+          </main>
+        </Pane>
+      </AppLayoutGrid>
+    </>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  const allPostsData = getSortedPostsData();
-  return {
-    props: {
-      allPostsData,
-    },
-  };
-};

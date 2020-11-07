@@ -1,6 +1,29 @@
 import { atom } from "recoil";
 import { CalendlyState } from "../components/Calendly";
 
+export const gridLengthAtom = atom({
+  key: "gridLength",
+  default: 4,
+});
+
+export const clickedAreasAtom = atom({
+  key: "clickedAreas",
+  default: [3, 4],
+});
+
+export const nthQuestionAtom = atom({
+  key: "nthQuestion",
+  default: 1,
+});
+
+export const imgUrlsAtom = atom({
+  key: "imgUrls",
+  default: {
+    inj: "http://placehold.jp/150x150.png",
+    ref: "http://placehold.jp/006699/cccc00/150x150.png",
+  },
+});
+
 export const radioAnswerWithName = (questionName: string) => {
   return atom({
     key: `radioAnswer-${questionName}`,
@@ -49,7 +72,6 @@ export const reservationDateAtom = atom({
   key: "reservationDate",
   default: "YYYY-MM-DD",
 });
-
 
 type CalendlySetting = {
   url: string;
