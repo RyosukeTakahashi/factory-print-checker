@@ -11,9 +11,49 @@ export const clickedAreasAtom = atom({
   default: [3, 4],
 });
 
-export const nthQuestionAtom = atom({
-  key: "nthQuestion",
+export const nthQuestionInSessionAtom = atom({
+  key: "nthQuestionInSession",
   default: 1,
+});
+
+export const nthSessionAtom = atom({
+  key: "nthSession",
+  default: 1,
+});
+
+export const maxSessionCountAtom = atom({
+  key: "maxSessionCount",
+  default: 7,
+});
+
+export const questionModeAtom = atom({
+  key: "mode",
+  default: "LF",
+});
+
+export const showAnswerAtom = atom({
+  key: "showAnswer",
+  default: "true",
+});
+
+export const startedAtom = atom({
+  key: "started",
+  default: false
+});
+
+export const startedTimeAtom = atom({
+  key: "startedTime",
+  default: Date.now()
+});
+
+export const subjectIdAtom = atom({
+  key: "subjectId",
+  default: "0"
+});
+
+export const accumulatedCorrectAnswerRateBorderAtom = atom({
+  key: "accumulatedCorrectAnswerRateBorder",
+  default: 75
 });
 
 export const imgUrlsAtom = atom({
