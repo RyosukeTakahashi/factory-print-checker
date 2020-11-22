@@ -1,5 +1,4 @@
 import { atom } from "recoil";
-import { CalendlyState } from "../components/Calendly";
 
 export const gridLengthAtom = atom({
   key: "gridLength",
@@ -13,12 +12,12 @@ export const clickedAreasAtom = atom({
 
 export const nthQuestionInSessionAtom = atom({
   key: "nthQuestionInSession",
-  default: 1,
+  default: 0,
 });
 
 export const nthSessionAtom = atom({
   key: "nthSession",
-  default: 1,
+  default: 0,
 });
 
 export const maxSessionCountAtom = atom({
@@ -28,7 +27,7 @@ export const maxSessionCountAtom = atom({
 
 export const questionModeAtom = atom({
   key: "mode",
-  default: "LF",
+  default: "SR",
 });
 
 export const showAnswerAtom = atom({
@@ -38,22 +37,57 @@ export const showAnswerAtom = atom({
 
 export const startedAtom = atom({
   key: "started",
-  default: false
+  default: false,
 });
 
 export const startedTimeAtom = atom({
   key: "startedTime",
-  default: Date.now()
+  default: Date.now(),
+});
+
+export const sessionStartedTimeAtom = atom({
+  key: "sessionStartedTime",
+  default: Date.now(),
+});
+
+export const areaPickedTimeAtom = atom({
+  key: "areaPickedTime",
+  default: Date.now(),
+});
+
+export const classPickedTimeAtom = atom({
+  key: "classPickedTime",
+  default: Date.now(),
+});
+
+export const chosenClassAtom = atom({
+  key: "chosenClass",
+  default: "hige",
 });
 
 export const subjectIdAtom = atom({
   key: "subjectId",
-  default: "0"
+  default: "0",
+});
+
+export const isInClassifySectionAtom = atom({
+  key: "isInClassifySection",
+  default: false,
+});
+
+export const isInGridSectionAtom = atom({
+  key: "isInGridSection",
+  default: false,
+});
+
+export const isInAnswerRevealSectionAtom = atom({
+  key: "isInAnswerRevealSection",
+  default: false,
 });
 
 export const accumulatedCorrectAnswerRateBorderAtom = atom({
   key: "accumulatedCorrectAnswerRateBorder",
-  default: 75
+  default: 75,
 });
 
 export const imgUrlsAtom = atom({
@@ -62,6 +96,16 @@ export const imgUrlsAtom = atom({
     inj: "http://placehold.jp/150x150.png",
     ref: "http://placehold.jp/006699/cccc00/150x150.png",
   },
+});
+
+export const targetImgUrlAtom = atom({
+  key: "targetImgUrls",
+  default: "http://placehold.jp/150x150.png",
+});
+
+export const labelImgUrlAtom = atom({
+  key: "labelImgUrls",
+  default: "http://placehold.jp/150x150.png",
 });
 
 export const radioAnswerWithName = (questionName: string) => {
@@ -96,11 +140,6 @@ export const howFoundMurakamiAtom = atom({
 export const seikakuNaviAtom = atom({
   key: "seikakuNavi",
   default: "",
-});
-
-export const calendlyStateAtom = atom({
-  key: "calendlyState",
-  default: CalendlyState.unshown,
 });
 
 export const otherOBTalkAtom = atom({
