@@ -25,9 +25,14 @@ type classCorrect = [string, number];
 export const orderQuestionsInSession = (
   nthSession,
   userAnswers,
-  answerRateBorder
+  answerRateBorder,
+  questionOrderInSession
 ) => {
-  const correctness = accumulatedClassesCorrectness(nthSession, userAnswers);
+  const correctness = accumulatedClassesCorrectness(
+    nthSession,
+    userAnswers,
+    questionOrderInSession
+  );
   console.log("entries", Object.entries(correctness));
   const entries = Object.entries(correctness).filter(
     (entry) => entry[1] < answerRateBorder / 100
@@ -35,7 +40,7 @@ export const orderQuestionsInSession = (
   const sortedEntries = entries.sort(
     (a: classCorrect, b: classCorrect) => a[1] - b[1]
   );
-  console.log("sorted_entries", sortedEntries);
+  console.log("sort_and_filtered_entries", sortedEntries);
   return sortedEntries.map((entry) => entry[0]);
 };
 
@@ -57,14 +62,20 @@ export const getNextImagePath = async (targetPath) => {
   };
 };
 
-const accumulatedClassesCorrectness = (nthSession, userAnswers) => {
-  return classifications.reduce((acc, classification) => {
+const accumulatedClassesCorrectness = (
+  nthSession,
+  userAnswers,
+  questionOrderInSession
+) => {
+  return questionOrderInSession.reduce((acc, classification) => {
     const classCorrectness = userAnswers.reduce((sum, session, index) => {
-      return sum + session[classification]
-        ? 2 ** (-1 * (nthSession - (index + 1) + 1))
-        : 0;
+      return (
+        sum +
+        (session[classification]
+          ? 2 ** (-1 * (nthSession - (index + 1) + 1))
+          : 0)
+      );
     }, 0);
-
     return Object.assign(acc, { [classification]: classCorrectness });
   }, {});
 };

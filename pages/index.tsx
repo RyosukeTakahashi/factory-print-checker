@@ -95,7 +95,6 @@ export default function Home({}: {}) {
   const moveToGridPickSection = async (nextClass) => {
     setIsInAnswerRevealSection(false);
     setIsInGridSection(true);
-    // const nextClass = questionOrderInSession[nthQuestion - 1];
     setCorrectClass(nextClass);
     const targetPath = `printer_test/target/${nextClass}/${selectedMode}`;
     const imgUrls = await getNextImagePath(targetPath);
@@ -144,6 +143,8 @@ export default function Home({}: {}) {
       }
     );
     // [{ oyogi: false }];をimmutableに、[{ oyogi: false, doctor: true }]に変える
+    //新しいセッションの場合、
+    //[{ oyogi: false, doctor: true }, {}]ををimmutableに[{ oyogi: false, doctor: true }, {oyogi: false}] に変える
     const newUserAnswersInSessionSet = Object.assign(
       [],
       userAnswersInSessionSet,
@@ -162,9 +163,10 @@ export default function Home({}: {}) {
     if (questionOrderInSession.length < nextNthQuestion) {
       const nextNthSession = nthSession + 1;
       const newQuestionOrder = orderQuestionsInSession(
-        nthSession,
+        nextNthSession - 1,
         newUserAnswersInSessionSet,
-        accumulatedCorrectAnswerRateBorder
+        accumulatedCorrectAnswerRateBorder,
+        questionOrderInSession
       );
       if (maxSessionCount < nextNthSession || newQuestionOrder.length === 0) {
         setIsInAnswerRevealSection(false);
