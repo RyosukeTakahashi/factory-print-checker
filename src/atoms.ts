@@ -1,5 +1,6 @@
 import { atom } from "recoil";
-import firebase from "firebase";
+import firebase from "firebase/app";
+import "firebase/firestore";
 
 export const gridLengthAtom = atom({
   key: "gridLength",
@@ -34,6 +35,11 @@ export const questionModeAtom = atom({
 export const showAnswerAtom = atom({
   key: "showAnswer",
   default: "true",
+});
+
+export const questionOrderInSessionAtom = atom({
+  key: "questionOrderInSession",
+  default: [],
 });
 
 export const startedAtom = atom({

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import {
   clickedAreasAtom,
   gridLengthAtom,

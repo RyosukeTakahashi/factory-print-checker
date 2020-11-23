@@ -1,4 +1,4 @@
-import { classes } from "../src/constants";
+import { classifications } from "../src/constants";
 import firebase from "../firebase/clientApp";
 
 export const generateOptions = (
@@ -20,25 +20,28 @@ export const formatTime = (datetimeStr) => {
   }:${(mm > 9 ? "" : "0") + mm}`;
 };
 
-export const chooseNextClass = (selectedMode) => {
-  switch (selectedMode) {
-    case "LF":
-      return chooseClassByLF();
-    case "SR":
-      return chooseClassBySR();
-  }
+type classCorrect = [string, number];
+
+export const orderQuestionsInSession = (
+  nthSession,
+  userAnswers,
+  answerRateBorder
+) => {
+  const correctness = accumulatedClassesCorrectness(nthSession, userAnswers);
+  console.log("entries", Object.entries(correctness));
+  const entries = Object.entries(correctness).filter(
+    (entry) => entry[1] < answerRateBorder / 100
+  );
+  const sortedEntries = entries.sort(
+    (a: classCorrect, b: classCorrect) => a[1] - b[1]
+  );
+  console.log("sorted_entries", sortedEntries);
+  return sortedEntries.map((entry) => entry[0]);
 };
-const chooseClassBySR = () =>
-  classes[Math.floor(Math.random() * classes.length)];
-const chooseClassByLF = () =>
-  classes[Math.floor(Math.random() * classes.length)];
 
 export const getNextImagePath = async (targetPath) => {
   const storage = firebase.storage();
-  const listResultDateFolder = await storage
-      .ref()
-      .child(targetPath)
-      .listAll();
+  const listResultDateFolder = await storage.ref().child(targetPath).listAll();
   const prefixes = listResultDateFolder.prefixes;
   const folderRef = prefixes[Math.floor(Math.random() * prefixes.length)];
   const listResultImgs = await folderRef.listAll();
@@ -46,10 +49,22 @@ export const getNextImagePath = async (targetPath) => {
   const imgRef = imgRefs[Math.floor(Math.random() * imgRefs.length)];
   const targetImgUrl = await imgRef.getDownloadURL();
   const labelImgUrl = await storage
-      .ref(imgRef.location.path_.replace("target", "label"))
-      .getDownloadURL();
+    .ref(imgRef.location.path_.replace("target", "label"))
+    .getDownloadURL();
   return {
     target: targetImgUrl,
     label: labelImgUrl,
   };
+};
+
+const accumulatedClassesCorrectness = (nthSession, userAnswers) => {
+  return classifications.reduce((acc, classification) => {
+    const classCorrectness = userAnswers.reduce((sum, session, index) => {
+      return sum + session[classification]
+        ? 2 ** (-1 * (nthSession - (index + 1) + 1))
+        : 0;
+    }, 0);
+
+    return Object.assign(acc, { [classification]: classCorrectness });
+  }, {});
 };

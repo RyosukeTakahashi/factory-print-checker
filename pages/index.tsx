@@ -29,20 +29,24 @@ import {
   subjectIdAtom,
   targetImgUrlAtom,
   correctClassAtom,
+  questionOrderInSessionAtom,
+  accumulatedCorrectAnswerRateBorderAtom,
 } from "../src/atoms";
 import { saveAnswerData } from "../src/fetchers";
-import { GetStaticProps } from "next";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import * as React from "react";
 import AnnotatedImage from "../components/AnnotatedImage";
-import { chooseNextClass, getNextImagePath } from "../lib/utils";
-import firebase from "firebase";
+import { getNextImagePath, orderQuestionsInSession } from "../lib/utils";
+import firebase from "../firebase/clientApp";
+import { useState } from "react";
+import { useEffect } from "react";
 
+//todo: QA
+//todo: firebaseプロジェクト作成
+//todo: 有馬アカウントに画像アップロード
+//todo: vercel deploy (env設定
 //todo: squares動かないようにする
-//todo: 出題済みクラスを選ばないようにする（選択されたstate＆選択済みstate作成）
-//todo: LFのクラス選定ロジック作成
-//todo: LFのセッション終了ロジック作成
 
 export default function Home({}: {}) {
   const [started, setStarted] = useRecoilState(startedAtom);
@@ -76,16 +80,22 @@ export default function Home({}: {}) {
   const [userChosenClass, setUserChosenClass] = useRecoilState(
     userChosenClassAtom
   );
+  const [questionOrderInSession, setQuestionOrderInSession] = useRecoilState(
+    questionOrderInSessionAtom
+  );
+  const accumulatedCorrectAnswerRateBorder = useRecoilValue(
+    accumulatedCorrectAnswerRateBorderAtom
+  );
   const subjectId = useRecoilValue(subjectIdAtom);
   const selectedMode = useRecoilValue(questionModeAtom);
   const showAnswer = useRecoilValue(showAnswerAtom);
   const sessionSetStartedTime = useRecoilValue(sessionSetStartedTimeAtom);
+  const [userAnswersInSessionSet, setUserAnswersInSessionSet] = useState([{}]);
 
-  const moveToAreaPickSection = async () => {
+  const moveToGridPickSection = async (nextClass) => {
     setIsInAnswerRevealSection(false);
     setIsInGridSection(true);
-    //already selected class的stateを加える。
-    const nextClass = chooseNextClass(selectedMode);
+    // const nextClass = questionOrderInSession[nthQuestion - 1];
     setCorrectClass(nextClass);
     const targetPath = `printer_test/target/${nextClass}/${selectedMode}`;
     const imgUrls = await getNextImagePath(targetPath);
@@ -104,7 +114,8 @@ export default function Home({}: {}) {
     setClassPickedTime(firebase.firestore.Timestamp.now());
   };
 
-  const moveToNextSession = async () => {
+  const moveToNextStep = async () => {
+    const chosenClassCorrect = userChosenClass === correctClass;
     const answer = {
       subjectId,
       selectedMode,
@@ -115,29 +126,71 @@ export default function Home({}: {}) {
       clickedAreas,
       userChosenClass,
       correctClass,
-      chosenClassCorrect: userChosenClass === correctClass,
-      startedTime: sessionSetStartedTime,
+      chosenClassCorrect,
+      sessionSetStartedTime,
       sessionStartedTime,
       areaPickedTime,
       classPickedTime,
     };
     await saveAnswerData(answer);
-    setNthSession(nthSession + 1);
-    setNthQuestionInSession(nthQuestionInSession + 1);
-    if (maxSessionCount <= nthSession) {
-      endSessionSet();
-      return;
+
+    // [{ oyogi: false }] から { oyogi: false, doctor: true }を出力。
+    console.log("userAnswers", userAnswersInSessionSet);
+    console.log("nthSession", nthSession);
+    const answersInSession = Object.assign(
+      userAnswersInSessionSet[nthSession - 1],
+      {
+        [correctClass]: chosenClassCorrect,
+      }
+    );
+    // [{ oyogi: false }];をimmutableに、[{ oyogi: false, doctor: true }]に変える
+    const newUserAnswersInSessionSet = Object.assign(
+      [],
+      userAnswersInSessionSet,
+      {
+        [nthSession - 1]: answersInSession,
+      }
+    );
+    console.log("new userAnswers", newUserAnswersInSessionSet);
+    setUserAnswersInSessionSet(newUserAnswersInSessionSet);
+
+    setClickedAreas([1, 2]); //for developement
+    setUserChosenClass("nasi"); //for developement
+    const nextNthQuestion = nthQuestionInSession + 1;
+
+    //goto next session if all classes are questioned.
+    if (questionOrderInSession.length < nextNthQuestion) {
+      const nextNthSession = nthSession + 1;
+      const newQuestionOrder = orderQuestionsInSession(
+        nthSession,
+        newUserAnswersInSessionSet,
+        accumulatedCorrectAnswerRateBorder
+      );
+      if (maxSessionCount < nextNthSession || newQuestionOrder.length === 0) {
+        setIsInAnswerRevealSection(false);
+        setUserAnswersInSessionSet([{}]);
+        setStarted(false); //end sessionSet
+        return;
+      }
+      // console.log(newQuestionOrder);
+      setNthSession(nextNthSession);
+      setUserAnswersInSessionSet(userAnswersInSessionSet.concat([{}]));
+      setQuestionOrderInSession(newQuestionOrder);
+      setNthQuestionInSession(1);
+      moveToGridPickSection(newQuestionOrder[0]).then(() => {});
+    } else {
+      //goto next question
+      await setNthQuestionInSession(nextNthQuestion);
+      moveToGridPickSection(
+        questionOrderInSession[nextNthQuestion - 1]
+      ).then(() => {});
     }
-    setClickedAreas([]);
-    setUserChosenClass(undefined);
-    moveToAreaPickSection().then();
   };
 
-  const endSessionSet = () => {
-    //SRだと、全セッション7門出題（各クラス1回ずつ）) done
-    //LFだと、1セッション目は7門だけど、それ以降のセッションは各クラスの累積正答率（後述参照）をみて、出題するクラスを絞っていく＆並べ替える
-    setStarted(false);
-  };
+  //for development.
+  useEffect(() => {
+    setUserChosenClass("fisheye");
+  }, []);
 
   const nextButton = (() => {
     if (isInGridSection)
@@ -167,7 +220,7 @@ export default function Home({}: {}) {
         <Button
           variant={"contained"}
           color={"primary"}
-          onClick={() => moveToNextSession()}
+          onClick={() => moveToNextStep()}
         >
           次の問題に行くときのボタン
         </Button>
@@ -226,9 +279,3 @@ export default function Home({}: {}) {
     </>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {},
-  };
-};

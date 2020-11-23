@@ -22,14 +22,14 @@ export const StyledLeftPaneRadioGroup = styled(RadioGroup)`
   font-size: 10px;
 `;
 
-export const classes = [
+export const classifications = [
   "doctor",
   "fisheye",
   "ink",
-  "kaburi",
-  "oyogi",
-  "tutu",
-  "nasi",
+  // "kaburi",
+  // "oyogi",
+  // "tutu",
+  // "nasi",
 ];
 
 export const classHash = {
