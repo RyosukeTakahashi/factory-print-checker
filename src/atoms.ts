@@ -9,7 +9,7 @@ export const gridLengthAtom = atom({
 
 export const clickedAreasAtom = atom({
   key: "clickedAreas",
-  default: [3, 4],
+  default: [],
 });
 
 export const nthQuestionInSessionAtom = atom({
@@ -80,6 +80,11 @@ export const correctClassAtom = atom({
 export const subjectIdAtom = atom({
   key: "subjectId",
   default: "0",
+});
+
+export const memoAtom = atom({
+  key: "memo",
+  default: "",
 });
 
 export const isInClassifySectionAtom = atom({

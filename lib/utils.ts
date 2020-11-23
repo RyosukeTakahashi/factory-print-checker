@@ -33,7 +33,6 @@ export const orderQuestionsInSession = (
     userAnswers,
     questionOrderInSession
   );
-  console.log("entries", Object.entries(correctness));
   const entries = Object.entries(correctness).filter(
     (entry) => entry[1] < answerRateBorder / 100
   );
@@ -67,15 +66,18 @@ const accumulatedClassesCorrectness = (
   userAnswers,
   questionOrderInSession
 ) => {
-  return questionOrderInSession.reduce((acc, classification) => {
-    const classCorrectness = userAnswers.reduce((sum, session, index) => {
-      return (
-        sum +
-        (session[classification]
-          ? 2 ** (-1 * (nthSession - (index + 1) + 1))
-          : 0)
-      );
-    }, 0);
-    return Object.assign(acc, { [classification]: classCorrectness });
-  }, {});
+  return questionOrderInSession
+    .slice()
+    .sort(() => Math.random() - 0.5)
+    .reduce((acc, classification) => {
+      const classCorrectness = userAnswers.reduce((sum, session, index) => {
+        return (
+          sum +
+          (session[classification]
+            ? 2 ** (-1 * (nthSession - (index + 1) + 1))
+            : 0)
+        );
+      }, 0);
+      return Object.assign(acc, { [classification]: classCorrectness });
+    }, {});
 };

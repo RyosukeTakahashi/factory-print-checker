@@ -28,7 +28,7 @@ import {
   sessionSetStartedTimeAtom,
   subjectIdAtom,
   targetImgUrlAtom,
-  questionOrderInSessionAtom,
+  questionOrderInSessionAtom, memoAtom,
 } from "../src/atoms";
 import * as React from "react";
 import { getNextImagePath } from "../lib/utils";
@@ -50,6 +50,7 @@ export default function LeftPane() {
     maxSessionCountAtom
   );
   const [started, setStarted] = useRecoilState(startedAtom);
+  const [memo, setMemo] = useRecoilState(memoAtom);
   const setStartedTime = useSetRecoilState(sessionSetStartedTimeAtom);
   const [
     accumulatedCorrectAnswerRateBorder,
@@ -86,12 +87,13 @@ export default function LeftPane() {
     setIsInGridSection(true);
   };
 
-  //for development. and classification in constants, setclickedareas in index.
-  useEffect(() => {
-    startSessionSet().then();
-    setSelectedMode("LF");
-    setMaxSessionCount(4);
-  }, []);
+  //for development. and classification in constants, setclickedareas, useeffect in index.
+  // useEffect(() => {
+  //   startSessionSet().then();
+  //   setSelectedMode("LF");
+  //   setMaxSessionCount(4);
+  //   setAccumulatedCorrectAnswerRateBorder(51)
+  // }, []);
 
   return (
     <StyledPane>
@@ -184,13 +186,24 @@ export default function LeftPane() {
         />
       </div>
 
+
+      <div className={"mt-4"}>
+        <TextField
+            id="memo"
+            label="メモ"
+            value={memo}
+            onChange={(e) => setMemo(e.target.value)}
+            disabled={started}
+        />
+      </div>
+
       <div className={"mt-6"}>
         <Button
           variant="contained"
           onClick={() => startSessionSet().then(() => {})}
           disabled={started || accumulatedCorrectAnswerRateBorder > 99}
         >
-          {"計測を開始"}
+          {"セッションセットを開始"}
         </Button>
       </div>
     </StyledPane>

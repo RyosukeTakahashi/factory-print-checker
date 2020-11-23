@@ -26,15 +26,15 @@ export const classifications = [
   "doctor",
   "fisheye",
   "ink",
-  // "kaburi",
-  // "oyogi",
-  // "tutu",
-  // "nasi",
+  "kaburi",
+  "oyogi",
+  "tutu",
+  "nasi",
 ];
 
 export const classHash = {
   doctor: "ドクター線",
-  fisheye: "フィシュアイ",
+  fisheye: "フィッシュアイ",
   ink: "インク",
   kaburi: "かぶり",
   oyogi: "およぎ",
