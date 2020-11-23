@@ -1,4 +1,5 @@
 import { atom } from "recoil";
+import firebase from "firebase";
 
 export const gridLengthAtom = atom({
   key: "gridLength",
@@ -40,28 +41,33 @@ export const startedAtom = atom({
   default: false,
 });
 
-export const startedTimeAtom = atom({
+export const sessionSetStartedTimeAtom = atom({
   key: "startedTime",
-  default: Date.now(),
+  default: firebase.firestore.Timestamp.now(),
 });
 
 export const sessionStartedTimeAtom = atom({
   key: "sessionStartedTime",
-  default: Date.now(),
+  default: firebase.firestore.Timestamp.now(),
 });
 
 export const areaPickedTimeAtom = atom({
   key: "areaPickedTime",
-  default: Date.now(),
+  default: firebase.firestore.Timestamp.now(),
 });
 
 export const classPickedTimeAtom = atom({
   key: "classPickedTime",
-  default: Date.now(),
+  default: firebase.firestore.Timestamp.now(),
 });
 
-export const chosenClassAtom = atom({
+export const userChosenClassAtom = atom({
   key: "chosenClass",
+  default: "",
+});
+
+export const correctClassAtom = atom({
+  key: "correctClass",
   default: "hige",
 });
 

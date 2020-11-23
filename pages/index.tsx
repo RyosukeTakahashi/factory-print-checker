@@ -2,7 +2,6 @@ import Head from "next/head";
 import Squares from "../components/Squares";
 import {
   AppLayoutGrid,
-  classes,
   classHash,
   Pane,
   StyledFlexRadioGroup,
@@ -12,7 +11,7 @@ import { Button } from "@material-ui/core";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
   areaPickedTimeAtom,
-  chosenClassAtom,
+  userChosenClassAtom,
   classPickedTimeAtom,
   clickedAreasAtom,
   isInAnswerRevealSectionAtom,
@@ -26,27 +25,28 @@ import {
   sessionStartedTimeAtom,
   showAnswerAtom,
   startedAtom,
-  startedTimeAtom,
+  sessionSetStartedTimeAtom,
   subjectIdAtom,
   targetImgUrlAtom,
+  correctClassAtom,
 } from "../src/atoms";
 import { saveAnswerData } from "../src/fetchers";
 import { GetStaticProps } from "next";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import * as React from "react";
-import { useState } from "react";
-import firebase from "../firebase/clientApp";
 import AnnotatedImage from "../components/AnnotatedImage";
+import { chooseNextClass, getNextImagePath } from "../lib/utils";
+import firebase from "firebase";
 
-//todo: 1セッション目で画像が表示されるようにする。
-//todo: LFの画像選定ロジック作成
-//todo: LFのセッション終了条件作成
+//todo: squares動かないようにする
 //todo: 出題済みクラスを選ばないようにする（選択されたstate＆選択済みstate作成）
+//todo: LFのクラス選定ロジック作成
+//todo: LFのセッション終了ロジック作成
 
 export default function Home({}: {}) {
   const [started, setStarted] = useRecoilState(startedAtom);
-  const setClickedAreas = useRecoilValue(clickedAreasAtom);
+  const [clickedAreas, setClickedAreas] = useRecoilState(clickedAreasAtom);
   const [nthSession, setNthSession] = useRecoilState(nthSessionAtom);
   const [nthQuestionInSession, setNthQuestionInSession] = useRecoilState(
     nthQuestionInSessionAtom
@@ -72,65 +72,39 @@ export default function Home({}: {}) {
   const [isInGridSection, setIsInGridSection] = useRecoilState(
     isInGridSectionAtom
   );
-  const [correctClass, setCorrectClass] = useState("");
-  const [chosenClass, setChosenClass] = useRecoilState(chosenClassAtom);
+  const [correctClass, setCorrectClass] = useRecoilState(correctClassAtom);
+  const [userChosenClass, setUserChosenClass] = useRecoilState(
+    userChosenClassAtom
+  );
   const subjectId = useRecoilValue(subjectIdAtom);
   const selectedMode = useRecoilValue(questionModeAtom);
   const showAnswer = useRecoilValue(showAnswerAtom);
-  const startedTime = useRecoilValue(startedTimeAtom);
-  const clickedAreas = useRecoilValue(clickedAreasAtom);
+  const sessionSetStartedTime = useRecoilValue(sessionSetStartedTimeAtom);
 
-  const chooseNextClass = () => {
-    //(SR/LF)のロジックに基づき、画像を選定する
-    let correctClass = "";
-    switch (selectedMode) {
-      case "LF":
-        correctClass = classes[Math.floor(Math.random() * classes.length)];
-        break;
-      case "SR":
-        correctClass = classes[Math.floor(Math.random() * classes.length)];
-        break;
-    }
-    setCorrectClass(correctClass);
-    return correctClass;
-  };
-
-  const getNextImagePath = async () => {
-    const storage = firebase.storage();
-    const targetPath = `printer_test/target/${chooseNextClass()}/${selectedMode}`;
-    const listResultDateFolder = await storage
-      .ref()
-      .child(targetPath)
-      .listAll();
-    const prefixes = listResultDateFolder.prefixes;
-    const folderRef = prefixes[Math.floor(Math.random() * prefixes.length)];
-    const listResultImgs = await folderRef.listAll();
-    const imgRefs = listResultImgs.items;
-    const imgRef = imgRefs[Math.floor(Math.random() * imgRefs.length)];
-    const targetImgUrl = await imgRef.getDownloadURL();
-    const labelImgUrl = await storage
-      .ref(imgRef.location.path_.replace("target", "label"))
-      .getDownloadURL();
-    setTargetImgUrl(targetImgUrl);
-    setLabelImgUrl(labelImgUrl);
-  };
-  const moveToAreaPickSection = () => {
-    setSessionStartedTime(Date.now());
+  const moveToAreaPickSection = async () => {
     setIsInAnswerRevealSection(false);
     setIsInGridSection(true);
+    //already selected class的stateを加える。
+    const nextClass = chooseNextClass(selectedMode);
+    setCorrectClass(nextClass);
+    const targetPath = `printer_test/target/${nextClass}/${selectedMode}`;
+    const imgUrls = await getNextImagePath(targetPath);
+    setTargetImgUrl(imgUrls.target);
+    setLabelImgUrl(imgUrls.label);
+    setSessionStartedTime(firebase.firestore.Timestamp.now());
   };
   const moveToClassPickSection = () => {
-    setAreaPickedTime(Date.now());
     setIsInGridSection(false);
     setIsInClassifySection(true);
+    setAreaPickedTime(firebase.firestore.Timestamp.now());
   };
   const moveToShowAnswerSection = () => {
-    setClassPickedTime(Date.now());
     setIsInClassifySection(false);
     setIsInAnswerRevealSection(true);
+    setClassPickedTime(firebase.firestore.Timestamp.now());
   };
 
-  const moveToNextSession = () => {
+  const moveToNextSession = async () => {
     const answer = {
       subjectId,
       selectedMode,
@@ -139,20 +113,24 @@ export default function Home({}: {}) {
       nthQuestionInSession,
       targetImgUrl,
       clickedAreas,
-      chosenClass,
+      userChosenClass,
       correctClass,
-      chosenClassCorrect: chosenClass === correctClass,
-      startedTime,
+      chosenClassCorrect: userChosenClass === correctClass,
+      startedTime: sessionSetStartedTime,
       sessionStartedTime,
       areaPickedTime,
       classPickedTime,
     };
-    saveAnswerData(answer).then((r) => {});
+    await saveAnswerData(answer);
     setNthSession(nthSession + 1);
     setNthQuestionInSession(nthQuestionInSession + 1);
-    getNextImagePath().then((r) => {});
-    moveToAreaPickSection();
-    if (maxSessionCount <= nthSession) endSessionSet();
+    if (maxSessionCount <= nthSession) {
+      endSessionSet();
+      return;
+    }
+    setClickedAreas([]);
+    setUserChosenClass(undefined);
+    moveToAreaPickSection().then();
   };
 
   const endSessionSet = () => {
@@ -167,7 +145,7 @@ export default function Home({}: {}) {
         <Button
           variant={"contained"}
           color={"primary"}
-          disabled={setClickedAreas.length == 0}
+          disabled={clickedAreas.length == 0}
           onClick={() => moveToClassPickSection()}
         >
           グリッドをを選択したときに推すボタン
@@ -178,6 +156,7 @@ export default function Home({}: {}) {
         <Button
           variant={"contained"}
           color={"primary"}
+          disabled={userChosenClass === ""}
           onClick={() => moveToShowAnswerSection()}
         >
           分類を選択にしたときに押すボタン
@@ -196,9 +175,9 @@ export default function Home({}: {}) {
   })();
 
   const answerMessage =
-    chosenClass === correctClass
+    userChosenClass === correctClass
       ? "正解です。"
-      : `不正解です。正解は${correctClass}です。`;
+      : `不正解です。正解は 『${classHash[correctClass]}』 です。`;
 
   const classOptions = Object.keys(classHash).map((key) => (
     <FormControlLabel
@@ -229,9 +208,9 @@ export default function Home({}: {}) {
               <StyledFlexRadioGroup
                 row
                 name="class-selection"
-                value={chosenClass}
+                value={userChosenClass}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setChosenClass(e.target.value)
+                  setUserChosenClass(e.target.value)
                 }
               >
                 {classOptions}
