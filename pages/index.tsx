@@ -31,6 +31,7 @@ import {
   correctClassAtom,
   questionOrderInSessionAtom,
   accumulatedCorrectAnswerRateBorderAtom,
+  memoAtom,
 } from "../src/atoms";
 import { saveAnswerData } from "../src/fetchers";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -42,7 +43,6 @@ import firebase from "../firebase/clientApp";
 import { useState } from "react";
 import { useEffect } from "react";
 
-//todo: QA
 //todo: firebaseプロジェクト作成
 //todo: 有馬アカウントに画像アップロード
 //todo: vercel deploy (env設定
@@ -64,6 +64,7 @@ export default function Home({}: {}) {
   const [areaPickedTime, setAreaPickedTime] = useRecoilState(
     areaPickedTimeAtom
   );
+  const memo = useRecoilValue(memoAtom);
   const [classPickedTime, setClassPickedTime] = useRecoilState(
     classPickedTimeAtom
   );
@@ -102,16 +103,6 @@ export default function Home({}: {}) {
     setLabelImgUrl(imgUrls.label);
     setSessionStartedTime(firebase.firestore.Timestamp.now());
   };
-  const moveToClassPickSection = () => {
-    setIsInGridSection(false);
-    setIsInClassifySection(true);
-    setAreaPickedTime(firebase.firestore.Timestamp.now());
-  };
-  const moveToShowAnswerSection = () => {
-    setIsInClassifySection(false);
-    setIsInAnswerRevealSection(true);
-    setClassPickedTime(firebase.firestore.Timestamp.now());
-  };
 
   const moveToNextStep = async () => {
     const chosenClassCorrect = userChosenClass === correctClass;
@@ -125,17 +116,17 @@ export default function Home({}: {}) {
       clickedAreas,
       userChosenClass,
       correctClass,
+      maxSessionCount,
       chosenClassCorrect,
       sessionSetStartedTime,
       sessionStartedTime,
       areaPickedTime,
       classPickedTime,
+      memo,
     };
     await saveAnswerData(answer);
 
     // [{ oyogi: false }] から { oyogi: false, doctor: true }を出力。
-    console.log("userAnswers", userAnswersInSessionSet);
-    console.log("nthSession", nthSession);
     const answersInSession = Object.assign(
       userAnswersInSessionSet[nthSession - 1],
       {
@@ -155,8 +146,8 @@ export default function Home({}: {}) {
     console.log("new userAnswers", newUserAnswersInSessionSet);
     setUserAnswersInSessionSet(newUserAnswersInSessionSet);
 
-    setClickedAreas([1, 2]); //for developement
-    setUserChosenClass("nasi"); //for developement
+    setClickedAreas([]); //for development
+    setUserChosenClass(""); //for development
     const nextNthQuestion = nthQuestionInSession + 1;
 
     //goto next session if all classes are questioned.
@@ -168,13 +159,13 @@ export default function Home({}: {}) {
         accumulatedCorrectAnswerRateBorder,
         questionOrderInSession
       );
+      console.log("new quesiton order:", newQuestionOrder);
       if (maxSessionCount < nextNthSession || newQuestionOrder.length === 0) {
         setIsInAnswerRevealSection(false);
         setUserAnswersInSessionSet([{}]);
         setStarted(false); //end sessionSet
         return;
       }
-      // console.log(newQuestionOrder);
       setNthSession(nextNthSession);
       setUserAnswersInSessionSet(userAnswersInSessionSet.concat([{}]));
       setQuestionOrderInSession(newQuestionOrder);
@@ -190,9 +181,9 @@ export default function Home({}: {}) {
   };
 
   //for development.
-  useEffect(() => {
-    setUserChosenClass("fisheye");
-  }, []);
+  // useEffect(() => {
+  //   setUserChosenClass("fisheye");
+  // }, []);
 
   const nextButton = (() => {
     if (isInGridSection)
@@ -200,10 +191,13 @@ export default function Home({}: {}) {
         <Button
           variant={"contained"}
           color={"primary"}
-          disabled={clickedAreas.length == 0}
-          onClick={() => moveToClassPickSection()}
+          onClick={() => {
+            setAreaPickedTime(firebase.firestore.Timestamp.now());
+            setIsInGridSection(false);
+            setIsInClassifySection(true);
+          }}
         >
-          グリッドをを選択したときに推すボタン
+          選択した箇所で回答する
         </Button>
       );
     if (isInClassifySection)
@@ -212,9 +206,18 @@ export default function Home({}: {}) {
           variant={"contained"}
           color={"primary"}
           disabled={userChosenClass === ""}
-          onClick={() => moveToShowAnswerSection()}
+          onClick={() => {
+            setClassPickedTime(firebase.firestore.Timestamp.now());
+            setIsInClassifySection(false);
+            if (showAnswer === "true") {
+              setIsInAnswerRevealSection(true);
+            } else {
+              setIsInClassifySection(false);
+              moveToNextStep().then(() => {});
+            }
+          }}
         >
-          分類を選択にしたときに押すボタン
+          選択した分類で回答する
         </Button>
       );
     if (isInAnswerRevealSection)
@@ -224,7 +227,7 @@ export default function Home({}: {}) {
           color={"primary"}
           onClick={() => moveToNextStep()}
         >
-          次の問題に行くときのボタン
+          次の問題に行く
         </Button>
       );
   })();
@@ -272,9 +275,10 @@ export default function Home({}: {}) {
               </StyledFlexRadioGroup>
             )}
 
-            {isInAnswerRevealSection && <div>{answerMessage}</div>}
-
-            {nextButton}
+            {isInAnswerRevealSection && (
+              <div className={"text-3xl"}>{answerMessage}</div>
+            )}
+            <div className={"mt-8"}>{nextButton}</div>
           </Pane>
         )}
       </AppLayoutGrid>
