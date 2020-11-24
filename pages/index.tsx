@@ -4,7 +4,6 @@ import {
   AppLayoutGrid,
   classHash,
   Pane,
-  StyledFlexRadioGroup,
 } from "../src/constants";
 import LeftPane from "../components/LeftPane";
 import { Button } from "@material-ui/core";
@@ -47,7 +46,6 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 //todo: アカウントに画像アップロード
 
 //todo: 画像表示なしのときに時間を送るタイミング must　(useEffect の depsをボタンの押下にする？
-//todo: 画像ダウンロード機能
 //todo: ファイル名調整して、1つのファイルにいれる。or flattenしてから・・・？
 //todo: 画像表示遅い問題
 

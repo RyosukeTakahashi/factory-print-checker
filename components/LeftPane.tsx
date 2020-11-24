@@ -1,5 +1,6 @@
 import {
   classifications,
+  cleanseData,
   csvHeaders,
   Pane,
   StyledLeftPaneRadioGroup,
@@ -223,7 +224,7 @@ export default function LeftPane() {
               setCsvParams({
                 filename: "testData.csv",
                 headers: csvHeaders,
-                data: dataArray,
+                data: cleanseData(dataArray),
               });
             })
           }
@@ -235,7 +236,7 @@ export default function LeftPane() {
             // asyncOnClick={true}
             {...csvParams}
             onClick={(event, done) => {
-              console.log("clicked")
+              console.log("clicked");
               // done(false);
             }}
           >
