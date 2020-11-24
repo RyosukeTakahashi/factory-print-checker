@@ -41,13 +41,15 @@ import AnnotatedImage from "../components/AnnotatedImage";
 import { getNextImagePath, orderQuestionsInSession } from "../lib/utils";
 import firebase from "../firebase/clientApp";
 import { useState } from "react";
+import RadioGroup from "@material-ui/core/RadioGroup";
 
 //todo: firebaseプロジェクト作成
 //todo: アカウントに画像アップロード
 
-//todo: 画像表示なしのときに時間を送るタイミング
+//todo: 画像表示なしのときに時間を送るタイミング must　(useEffect の depsをボタンの押下にする？
+//todo: 画像ダウンロード機能
+//todo: ファイル名調整して、1つのファイルにいれる。or flattenしてから・・・？
 //todo: 画像表示遅い問題
-//todo: squares動かないようにする
 
 export default function Home({}: {}) {
   const [started, setStarted] = useRecoilState(startedAtom);
@@ -253,13 +255,13 @@ export default function Home({}: {}) {
         {started && (
           <Pane area={"centerPane"}>
             <p>{`第${nthSession}セッション, 第${nthQuestionInSession}問目`}</p>
-            <main className={"flex justify-around"}>
+            <main className={"flex justify-start"}>
               <Squares />
               {isInAnswerRevealSection && <AnnotatedImage />}
             </main>
 
             {(isInClassifySection || isInAnswerRevealSection) && (
-              <StyledFlexRadioGroup
+              <RadioGroup
                 row
                 name="class-selection"
                 value={userChosenClass}
@@ -268,7 +270,7 @@ export default function Home({}: {}) {
                 }
               >
                 {classOptions}
-              </StyledFlexRadioGroup>
+              </RadioGroup>
             )}
 
             {isInAnswerRevealSection && (

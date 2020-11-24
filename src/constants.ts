@@ -41,3 +41,9 @@ export const classHash = {
   tutu: "ツーツー",
   nasi: "なし",
 };
+
+export const csvHeaders = [
+  { label: "chosenClassCorrect", key: "chosenClassCorrect" },
+  { label: "correctClass", key: "correctClass" },
+  { label: "maxSessionCount", key: "maxSessionCount" },
+];

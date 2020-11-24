@@ -7,6 +7,7 @@ import {
 } from "../src/atoms";
 
 const GridLayout = styled.div`
+  margin-left: 30px;
   display: grid;
   width: 350px;
   height: 350px;

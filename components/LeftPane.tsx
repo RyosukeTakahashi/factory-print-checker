@@ -1,5 +1,6 @@
 import {
   classifications,
+  csvHeaders,
   Pane,
   StyledLeftPaneRadioGroup,
 } from "../src/constants";
@@ -10,9 +11,10 @@ import {
   FormControlLabel,
   Radio,
 } from "@material-ui/core";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import TextField from "@material-ui/core/TextField";
 import { useRecoilState, useSetRecoilState } from "recoil";
+import { CSVLink } from "react-csv";
 import {
   accumulatedCorrectAnswerRateBorderAtom,
   correctClassAtom,
@@ -28,11 +30,13 @@ import {
   sessionSetStartedTimeAtom,
   subjectIdAtom,
   targetImgUrlAtom,
-  questionOrderInSessionAtom, memoAtom,
+  questionOrderInSessionAtom,
+  memoAtom,
 } from "../src/atoms";
 import * as React from "react";
 import { getNextImagePath } from "../lib/utils";
 import firebase from "../firebase/clientApp";
+import { getAnswers } from "../src/fetchers";
 
 const StyledPane = styled(Pane)`
   border-right-width: medium;
@@ -66,6 +70,11 @@ export default function LeftPane() {
   const [questionOrderInSession, setQuestionOrderInSession] = useRecoilState(
     questionOrderInSessionAtom
   );
+  const [csvParams, setCsvParams] = useState({
+    data: [],
+    headers: [],
+    filename: "",
+  });
 
   const startSessionSet = async () => {
     const questionOrder = classifications
@@ -186,14 +195,13 @@ export default function LeftPane() {
         />
       </div>
 
-
       <div className={"mt-4"}>
         <TextField
-            id="memo"
-            label="メモ"
-            value={memo}
-            onChange={(e) => setMemo(e.target.value)}
-            disabled={started}
+          id="memo"
+          label="メモ"
+          value={memo}
+          onChange={(e) => setMemo(e.target.value)}
+          disabled={started}
         />
       </div>
 
@@ -205,6 +213,35 @@ export default function LeftPane() {
         >
           {"セッションセットを開始"}
         </Button>
+      </div>
+
+      <div className={"mt-6"}>
+        <Button
+          variant="contained"
+          onClick={() =>
+            getAnswers().then((dataArray) => {
+              setCsvParams({
+                filename: "testData.csv",
+                headers: csvHeaders,
+                data: dataArray,
+              });
+            })
+          }
+        >
+          {"save first"}
+        </Button>
+        {csvParams.data.length > 0 && (
+          <CSVLink
+            // asyncOnClick={true}
+            {...csvParams}
+            onClick={(event, done) => {
+              console.log("clicked")
+              // done(false);
+            }}
+          >
+            download csv
+          </CSVLink>
+        )}
       </div>
     </StyledPane>
   );
