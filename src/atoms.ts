@@ -107,14 +107,6 @@ export const accumulatedCorrectAnswerRateBorderAtom = atom({
   default: 75,
 });
 
-export const imgUrlsAtom = atom({
-  key: "imgUrls",
-  default: {
-    inj: "http://placehold.jp/150x150.png",
-    ref: "http://placehold.jp/006699/cccc00/150x150.png",
-  },
-});
-
 export const targetImgUrlAtom = atom({
   key: "targetImgUrls",
   default: "http://placehold.jp/150x150.png",
@@ -138,36 +130,6 @@ export const checkboxAnswerWithName = (questionName: string) => {
     default: [],
   });
 };
-
-export const reservationsAtom = atom({
-  key: "reservations",
-  default: null as Reservation[],
-});
-
-export const otherTalkThemeAtom = atom({
-  key: "talkTheme",
-  default: "",
-});
-
-export const howFoundMurakamiAtom = atom({
-  key: "howFoundMurakami",
-  default: "",
-});
-
-export const seikakuNaviAtom = atom({
-  key: "seikakuNavi",
-  default: "",
-});
-
-export const otherOBTalkAtom = atom({
-  key: "otherOBTalk",
-  default: "",
-});
-
-export const reservationDateAtom = atom({
-  key: "reservationDate",
-  default: "YYYY-MM-DD",
-});
 
 type CalendlySetting = {
   url: string;
