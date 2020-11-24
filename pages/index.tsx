@@ -45,6 +45,8 @@ import { useState } from "react";
 //todo: firebaseプロジェクト作成
 //todo: アカウントに画像アップロード
 
+//todo: 画像表示なしのときに時間を送るタイミング
+//todo: 画像表示遅い問題
 //todo: squares動かないようにする
 
 export default function Home({}: {}) {

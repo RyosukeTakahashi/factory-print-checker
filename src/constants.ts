@@ -38,6 +38,6 @@ export const classHash = {
   ink: "インク",
   kaburi: "かぶり",
   oyogi: "およぎ",
-  tutu: "つつ",
+  tutu: "ツーツー",
   nasi: "なし",
 };
