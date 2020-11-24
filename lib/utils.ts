@@ -39,6 +39,7 @@ export const getNextImagePath = async (targetPath) => {
   const imgRefs = listResultImgs.items;
   const imgRef = imgRefs[Math.floor(Math.random() * imgRefs.length)];
   const targetImgUrl = await imgRef.getDownloadURL();
+  // @ts-ignore
   const labelImgUrl = await storage
     .ref(imgRef.location.path_.replace("target", "label"))
     .getDownloadURL();
