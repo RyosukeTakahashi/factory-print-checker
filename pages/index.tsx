@@ -45,7 +45,6 @@ import { useState } from "react";
 //todo: firebaseプロジェクト作成
 //todo: アカウントに画像アップロード
 
-//todo: vercel deploy (env設定
 //todo: squares動かないようにする
 
 export default function Home({}: {}) {
