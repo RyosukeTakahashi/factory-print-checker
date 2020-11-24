@@ -41,10 +41,10 @@ import AnnotatedImage from "../components/AnnotatedImage";
 import { getNextImagePath, orderQuestionsInSession } from "../lib/utils";
 import firebase from "../firebase/clientApp";
 import { useState } from "react";
-import { useEffect } from "react";
 
 //todo: firebaseプロジェクト作成
-//todo: 有馬アカウントに画像アップロード
+//todo: アカウントに画像アップロード
+
 //todo: vercel deploy (env設定
 //todo: squares動かないようにする
 
@@ -179,11 +179,6 @@ export default function Home({}: {}) {
       ).then(() => {});
     }
   };
-
-  //for development.
-  // useEffect(() => {
-  //   setUserChosenClass("fisheye");
-  // }, []);
 
   const nextButton = (() => {
     if (isInGridSection)
