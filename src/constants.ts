@@ -56,10 +56,11 @@ export const csvHeaders = [
   { label: "classPickedTime", key: "classPickedTime" },
   { label: "sessionStartedTime", key: "sessionStartedTime" },
   { label: "sessionSetStartedTime", key: "sessionSetStartedTime" },
-  { label: "targetImgUrl", key: "targetImgUrl" },
   { label: "showAnswer", key: "showAnswer" },
   { label: "maxSessionCount", key: "maxSessionCount" },
   { label: "memo", key: "memo" },
+  { label: "imgPath", key: "imgPath" },
+  { label: "targetImgUrl", key: "targetImgUrl" },
 ];
 
 export const cleanseData = (dataArray: firebase.firestore.DocumentData[]) => {

@@ -93,6 +93,7 @@ export default function Home({}: {}) {
   const showAnswer = useRecoilValue(showAnswerAtom);
   const sessionSetStartedTime = useRecoilValue(sessionSetStartedTimeAtom);
   const [userAnswersInSessionSet, setUserAnswersInSessionSet] = useState([{}]);
+  const [imgPath, setImgPath] = useState("");
 
   const moveToGridPickSection = async (nextClass) => {
     setIsInAnswerRevealSection(false);
@@ -102,6 +103,7 @@ export default function Home({}: {}) {
     const imgUrls = await getNextImagePath(targetPath);
     setTargetImgUrl(imgUrls.target);
     setLabelImgUrl(imgUrls.label);
+    setImgPath(imgUrls.path);
     setSessionStartedTime(firebase.firestore.Timestamp.now());
   };
 
@@ -114,6 +116,7 @@ export default function Home({}: {}) {
       nthSession,
       nthQuestionInSession,
       targetImgUrl,
+      imgPath,
       clickedAreas,
       userChosenClass,
       correctClass,

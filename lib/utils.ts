@@ -46,6 +46,8 @@ export const getNextImagePath = async (targetPath) => {
   return {
     target: targetImgUrl,
     label: labelImgUrl,
+    // @ts-ignore
+    path: imgRef.location.path_
   };
 };
 
