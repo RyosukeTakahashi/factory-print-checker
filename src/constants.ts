@@ -34,13 +34,13 @@ export const classifications = [
 ];
 
 export const classHash = {
+  nasi: "なし",
   doctor: "ドクター線",
   fisheye: "フィッシュアイ",
-  ink: "インク",
+  ink: "インクはね",
   kaburi: "かぶり",
   oyogi: "およぎ",
   tutu: "ツーツー",
-  nasi: "なし",
 };
 
 export const csvHeaders = [

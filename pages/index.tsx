@@ -45,7 +45,7 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 //todo: firebaseプロジェクト作成
 //todo: アカウントに画像アップロード
 
-//todo: 画像表示なしのときに時間を送るタイミング must　(useEffect の depsをボタンの押下にする？
+//todo: 画像表示なしのときに時間を送るタイミング must　(useEffect の depsにclassPickedTimeいれて、if !showAnswer mode なら moveToNextPhase
 //todo: ファイル名調整して、1つのファイルにいれる。or flattenしてから・・・？
 //todo: 画像表示遅い問題
 
