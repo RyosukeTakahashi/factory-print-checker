@@ -158,7 +158,7 @@ export default function Home({}: {}) {
         accumulatedCorrectAnswerRateBorder,
         questionOrderInSession
       );
-      console.log("new quesiton order:", newQuestionOrder);
+      console.log("new question order:", newQuestionOrder);
       if (maxSessionCount < nextNthSession || newQuestionOrder.length === 0) {
         setIsInAnswerRevealSection(false);
         setUserAnswersInSessionSet([{}]);

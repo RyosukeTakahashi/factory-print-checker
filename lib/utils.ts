@@ -34,20 +34,23 @@ export const getNextImagePath = async (targetPath) => {
   const storage = firebase.storage();
   const listResultDateFolder = await storage.ref().child(targetPath).listAll();
   const prefixes = listResultDateFolder.prefixes;
-  const folderRef = prefixes[Math.floor(Math.random() * prefixes.length)];
-  const listResultImgs = await folderRef.listAll();
-  const imgRefs = listResultImgs.items;
-  const imgRef = imgRefs[Math.floor(Math.random() * imgRefs.length)];
+  //以下で、フォルダーをひとつ選んでいるが、フォルダーによって格納されている画像の数が違うため、全てのフォルダの画像をリストしてflattenが必要化。
+  const folderRefsArray = await Promise.all(
+    prefixes.map((folderRef) => folderRef.listAll())
+  );
+  const allImgRefs = folderRefsArray
+    .flat()
+    .map((imgFolderListResult) => imgFolderListResult.items)
+    .flat();
+  const imgRef = allImgRefs[Math.floor(Math.random() * allImgRefs.length)];
   const targetImgUrl = await imgRef.getDownloadURL();
   const labelImgUrl = await storage
-  // @ts-ignore
-    .ref(imgRef.location.path_.replace("target", "label"))
+    .ref(imgRef.fullPath.replace("target", "label"))
     .getDownloadURL();
   return {
     target: targetImgUrl,
     label: labelImgUrl,
-    // @ts-ignore
-    path: imgRef.location.path_
+    path: imgRef.fullPath,
   };
 };
 
