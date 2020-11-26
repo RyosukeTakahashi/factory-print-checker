@@ -1,10 +1,6 @@
 import Head from "next/head";
 import Squares from "../components/Squares";
-import {
-  AppLayoutGrid,
-  classHash,
-  Pane,
-} from "../src/constants";
+import { AppLayoutGrid, classHash, Pane } from "../src/constants";
 import LeftPane from "../components/LeftPane";
 import { Button } from "@material-ui/core";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
@@ -45,7 +41,6 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 //todo: firebaseプロジェクト作成
 //todo: アカウントに画像アップロード
 
-//todo: 画像表示なしのときに時間を送るタイミング must　(useEffect の depsにclassPickedTimeいれて、if !showAnswer mode なら moveToNextPhase
 //todo: ファイル名調整して、1つのファイルにいれる。or flattenしてから・・・？
 //todo: 画像表示遅い問題
 
@@ -208,11 +203,12 @@ export default function Home({}: {}) {
           onClick={() => {
             setClassPickedTime(firebase.firestore.Timestamp.now());
             setIsInClassifySection(false);
-            if (showAnswer === "true") {
-              setIsInAnswerRevealSection(true);
-            } else {
-              moveToNextStep().then(() => {});
-            }
+            setIsInAnswerRevealSection(true);
+            // if (showAnswer === "true") {
+            //   setIsInAnswerRevealSection(true);
+            // } else {
+            //   moveToNextStep().then(() => {});
+            // }
           }}
         >
           選択した分類で回答する
@@ -222,7 +218,7 @@ export default function Home({}: {}) {
       return (
         <Button
           variant={"contained"}
-          color={"primary"}
+          color={"secondary"}
           onClick={() => moveToNextStep()}
         >
           次の問題に行く
@@ -245,6 +241,7 @@ export default function Home({}: {}) {
     />
   ));
 
+  const showImage = isInAnswerRevealSection && showAnswer === "true";
   return (
     <>
       <Head>
@@ -257,7 +254,7 @@ export default function Home({}: {}) {
             <p>{`第${nthSession}セッション, 第${nthQuestionInSession}問目`}</p>
             <main className={"flex justify-start"}>
               <Squares />
-              {isInAnswerRevealSection && <AnnotatedImage />}
+              {showImage && <AnnotatedImage />}
             </main>
 
             {(isInClassifySection || isInAnswerRevealSection) && (
@@ -273,9 +270,7 @@ export default function Home({}: {}) {
               </RadioGroup>
             )}
 
-            {(isInAnswerRevealSection && showAnswer) && (
-              <div className={"text-3xl"}>{answerMessage}</div>
-            )}
+            {showImage && <div className={"text-3xl"}>{answerMessage}</div>}
             <div className={"mt-8"}>{nextButton}</div>
           </Pane>
         )}
