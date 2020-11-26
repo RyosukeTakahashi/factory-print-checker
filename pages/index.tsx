@@ -1,6 +1,11 @@
 import Head from "next/head";
 import Squares from "../components/Squares";
-import { AppLayoutGrid, classHash, Pane } from "../src/constants";
+import {
+  AppLayoutGrid,
+  classHash,
+  classifications,
+  Pane,
+} from "../src/constants";
 import LeftPane from "../components/LeftPane";
 import { Button } from "@material-ui/core";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
@@ -152,12 +157,15 @@ export default function Home({}: {}) {
     //goto next session if all classes are questioned.
     if (questionOrderInSession.length < nextNthQuestion) {
       const nextNthSession = nthSession + 1;
-      const newQuestionOrder = orderQuestionsInSession(
-        nextNthSession - 1,
-        newUserAnswersInSessionSet,
-        accumulatedCorrectAnswerRateBorder,
-        questionOrderInSession
-      );
+      const newQuestionOrder =
+        selectedMode === "SR"
+          ? classifications.slice().sort(() => Math.random() - 0.5)
+          : orderQuestionsInSession(
+              nextNthSession - 1,
+              newUserAnswersInSessionSet,
+              accumulatedCorrectAnswerRateBorder,
+              questionOrderInSession
+            );
       console.log("new question order:", newQuestionOrder);
       if (maxSessionCount < nextNthSession || newQuestionOrder.length === 0) {
         setIsInAnswerRevealSection(false);

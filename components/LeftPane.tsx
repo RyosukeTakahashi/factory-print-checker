@@ -233,7 +233,6 @@ export default function LeftPane() {
         </Button>
         {csvParams.data.length > 0 && (
           <CSVLink
-            // asyncOnClick={true}
             {...csvParams}
             onClick={(event, done) => {
               console.log("clicked");
