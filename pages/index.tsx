@@ -211,7 +211,6 @@ export default function Home({}: {}) {
             if (showAnswer === "true") {
               setIsInAnswerRevealSection(true);
             } else {
-              setIsInClassifySection(false);
               moveToNextStep().then(() => {});
             }
           }}
@@ -274,7 +273,7 @@ export default function Home({}: {}) {
               </RadioGroup>
             )}
 
-            {isInAnswerRevealSection && (
+            {(isInAnswerRevealSection && showAnswer) && (
               <div className={"text-3xl"}>{answerMessage}</div>
             )}
             <div className={"mt-8"}>{nextButton}</div>
