@@ -8,8 +8,8 @@ import {
 
 const GridLayout = styled.div`
   display: grid;
-  width: 350px;
-  height: 350px;
+  width: 512px;
+  height: 512px;
   grid-template-columns: repeat(${(props) => props.gridLength}, 1fr);
   background-image: url(${(props) => props.imgUrl});
   background-repeat: no-repeat;
@@ -20,7 +20,7 @@ const Area = styled.div`
   grid-column: ${(props) => props.column};
   grid-row: ${(props) => props.row};
   border: ${(props) =>
-    props.isAreaClicked ? "0.5px solid red" : "0.5px dashed blue"};
+    props.isAreaClicked ? "1px dashed red" : "1px dashed blue"};
   user-select: none;
 `;
 

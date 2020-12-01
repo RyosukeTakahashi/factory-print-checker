@@ -46,8 +46,8 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 //todo: firebaseプロジェクト作成
 //todo: アカウントに画像アップロード
 
-//todo: ファイル名調整して、1つのファイルにいれる。or flattenしてから・・・？
-//todo: 画像表示遅い問題
+//todo: Driveファイル差し替え→python実行でJson作成→Storageに再アップロード
+//todo: background image preload, css multiple background, content-url。
 
 export default function Home({}: {}) {
   const [started, setStarted] = useRecoilState(startedAtom);

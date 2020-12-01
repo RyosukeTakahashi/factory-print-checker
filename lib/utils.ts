@@ -74,3 +74,13 @@ const accumulatedClassesCorrectness = (
       return Object.assign(acc, { [classification]: classCorrectness });
     }, {});
 };
+
+const getAnswerGridFromPixels = (pixels: [number, number][]) => {
+  const gridLength = 4;
+  const pixelPerGrid = 512 / gridLength;
+  const answers = pixels.map((pixel) => [
+    Math.ceil(pixel[0] / pixelPerGrid),
+    Math.ceil(pixel[1] / pixelPerGrid),
+  ]);
+  return answers
+};
