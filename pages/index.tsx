@@ -43,11 +43,12 @@ import firebase from "../firebase/clientApp";
 import { useState } from "react";
 import RadioGroup from "@material-ui/core/RadioGroup";
 
-//todo: firebaseプロジェクト作成
-//todo: アカウントに画像アップロード
 
-//todo: Driveファイル差し替え→python実行でJson作成→Storageに再アップロード
-//todo: background image preload, css multiple background, content-url。
+//todo: 正解jsonをgetPropsで取得して、正解不正解を判断する
+//todo: 正解箇所に応じて混合行列表示してあげる
+//余裕あれば: background image preload, css multiple background, content-url。
+//余裕あれば: firebaseプロジェクト作成
+//余裕あれば: アカウントに画像アップロード
 
 export default function Home({}: {}) {
   const [started, setStarted] = useRecoilState(startedAtom);
