@@ -46,6 +46,7 @@ export const classHash = {
 export const csvHeaders = [
   { label: "subjectId", key: "subjectId" },
   { label: "clickedAreas", key: "clickedAreas" },
+  { label: "correctGrids", key: "correctGrids" },
   { label: "userChosenClass", key: "userChosenClass" },
   { label: "correctClass", key: "correctClass" },
   { label: "chosenClassCorrect", key: "chosenClassCorrect" },
@@ -78,12 +79,14 @@ export const cleanseData = (dataArray: firebase.firestore.DocumentData[]) => {
       sessionData.sessionSetStartedTime.seconds +
       sessionData.sessionSetStartedTime.nanoseconds * 10 ** -9;
     const clickedAreas = String(sessionData.clickedAreas);
+    const correctGrids = String(sessionData.correctGrids);
     return Object.assign(sessionData, {
       areaPickedTime,
       classPickedTime,
       sessionStartedTime,
       sessionSetStartedTime,
       clickedAreas,
+      correctGrids,
     });
   });
 };

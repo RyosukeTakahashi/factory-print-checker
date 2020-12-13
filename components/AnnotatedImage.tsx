@@ -1,16 +1,16 @@
 import styled from "styled-components";
-import { useRecoilValue } from "recoil";
+import {useRecoilState, useRecoilValue} from "recoil";
 import {
-  clickedAreasAtom,
-  gridLengthAtom,
+  clickedAreasAtom, correctGridsAtom,
+  gridLengthAtom, imgPathAtom,
   labelImgUrlAtom,
 } from "../src/atoms";
 
 const GridLayout = styled.div`
   margin-left: 30px;
   display: grid;
-  width: 350px;
-  height: 350px;
+  width: 512px;
+  height: 512px;
   grid-template-columns: repeat(${(props) => props.gridLength}, 1fr);
   background-image: url(${(props) => props.imgUrl});
   background-repeat: no-repeat;
@@ -20,21 +20,22 @@ const GridLayout = styled.div`
 const Area = styled.div`
   grid-column: ${(props) => props.column};
   grid-row: ${(props) => props.row};
-  border: 0.5px dashed blue;
+  border: ${(props) =>
+    props.isAreaClicked ? "1px solid red" : "1px dashed blue"};
   user-select: none;
 `;
 
 export default function AnnotatedImage({}: {}) {
   const gridLength = useRecoilValue(gridLengthAtom);
   const imgUrl = useRecoilValue(labelImgUrlAtom);
-  const clickedAreas = useRecoilValue(clickedAreasAtom);
+  const correctGrids = useRecoilValue(correctGridsAtom);
 
   const areas = Array.from({ length: gridLength }).map((_, i) => {
     return Array.from({ length: gridLength }).map((_, j) => {
       const row = i + 1;
       const column = j + 1;
       const nthGrid = i * gridLength + column;
-      const isAreaClicked = clickedAreas.includes(nthGrid);
+      const isAreaClicked = correctGrids.includes(nthGrid);
       return (
         <Area
           column={column}

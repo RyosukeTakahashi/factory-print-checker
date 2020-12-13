@@ -10,47 +10,56 @@ import LeftPane from "../components/LeftPane";
 import { Button } from "@material-ui/core";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
+  accumulatedCorrectAnswerRateBorderAtom,
   areaPickedTimeAtom,
-  userChosenClassAtom,
   classPickedTimeAtom,
   clickedAreasAtom,
+  correctClassAtom,
+  correctGridsAtom,
+  imgPathAtom,
   isInAnswerRevealSectionAtom,
   isInClassifySectionAtom,
   isInGridSectionAtom,
   labelImgUrlAtom,
   maxSessionCountAtom,
+  memoAtom,
   nthQuestionInSessionAtom,
   nthSessionAtom,
   questionModeAtom,
+  questionOrderInSessionAtom,
+  sessionSetStartedTimeAtom,
   sessionStartedTimeAtom,
   showAnswerAtom,
   startedAtom,
-  sessionSetStartedTimeAtom,
   subjectIdAtom,
   targetImgUrlAtom,
-  correctClassAtom,
-  questionOrderInSessionAtom,
-  accumulatedCorrectAnswerRateBorderAtom,
-  memoAtom,
+  userChosenClassAtom,
 } from "../src/atoms";
 import { saveAnswerData } from "../src/fetchers";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import * as React from "react";
+import { useEffect, useState } from "react";
 import AnnotatedImage from "../components/AnnotatedImage";
-import { getNextImagePath, orderQuestionsInSession } from "../lib/utils";
+import {
+  getCorrectGrids,
+  getNextImagePath,
+  orderQuestionsInSession,
+} from "../lib/utils";
 import firebase from "../firebase/clientApp";
-import { useState } from "react";
 import RadioGroup from "@material-ui/core/RadioGroup";
+import path from "path";
+import fs from "fs";
+import { GetStaticProps } from "next";
+import {AnswerResultTable} from "../components/AnswerResultTable";
 
-
-//todo: 正解jsonをgetPropsで取得して、正解不正解を判断する
+//todo: 正解不正解を判断する
 //todo: 正解箇所に応じて混合行列表示してあげる
 //余裕あれば: background image preload, css multiple background, content-url。
 //余裕あれば: firebaseプロジェクト作成
 //余裕あれば: アカウントに画像アップロード
 
-export default function Home({}: {}) {
+export default function Home({ gridAnswer }) {
   const [started, setStarted] = useRecoilState(startedAtom);
   const [clickedAreas, setClickedAreas] = useRecoilState(clickedAreasAtom);
   const [nthSession, setNthSession] = useRecoilState(nthSessionAtom);
@@ -80,6 +89,7 @@ export default function Home({}: {}) {
     isInGridSectionAtom
   );
   const [correctClass, setCorrectClass] = useRecoilState(correctClassAtom);
+  const [correctGrids, setCorrectGrids] = useRecoilState(correctGridsAtom);
   const [userChosenClass, setUserChosenClass] = useRecoilState(
     userChosenClassAtom
   );
@@ -94,7 +104,7 @@ export default function Home({}: {}) {
   const showAnswer = useRecoilValue(showAnswerAtom);
   const sessionSetStartedTime = useRecoilValue(sessionSetStartedTimeAtom);
   const [userAnswersInSessionSet, setUserAnswersInSessionSet] = useState([{}]);
-  const [imgPath, setImgPath] = useState("");
+  const [imgPath, setImgPath] = useRecoilState(imgPathAtom);
 
   const moveToGridPickSection = async (nextClass) => {
     setIsInAnswerRevealSection(false);
@@ -107,6 +117,13 @@ export default function Home({}: {}) {
     setImgPath(imgUrls.path);
     setSessionStartedTime(firebase.firestore.Timestamp.now());
   };
+
+  //gridAnswerを使い, それをpropバケツリレーするのが嫌だったため、useEffectでrecoilにわたす、
+  useEffect(() => {
+    if (started) {
+      setCorrectGrids(getCorrectGrids(gridAnswer, imgPath));
+    }
+  }, [imgPath, started]);
 
   const moveToNextStep = async () => {
     const chosenClassCorrect = userChosenClass === correctClass;
@@ -121,6 +138,7 @@ export default function Home({}: {}) {
       clickedAreas,
       userChosenClass,
       correctClass,
+      correctGrids,
       maxSessionCount,
       chosenClassCorrect,
       sessionSetStartedTime,
@@ -232,8 +250,8 @@ export default function Home({}: {}) {
 
   const answerMessage =
     userChosenClass === correctClass
-      ? "正解です。"
-      : `不正解です。正解は 『${classHash[correctClass]}』 です。`;
+      ? "分類：正解です。"
+      : `分類：不正解です。正解は 『${classHash[correctClass]}』 です。`;
 
   const classOptions = Object.keys(classHash).map((key) => (
     <FormControlLabel
@@ -245,7 +263,8 @@ export default function Home({}: {}) {
     />
   ));
 
-  const showImage = isInAnswerRevealSection && showAnswer === "true";
+  const showAnnotation = isInAnswerRevealSection && showAnswer === "true";
+
   return (
     <>
       <Head>
@@ -258,7 +277,7 @@ export default function Home({}: {}) {
             <p>{`第${nthSession}セッション, 第${nthQuestionInSession}問目`}</p>
             <main className={"flex justify-start"}>
               <Squares />
-              {showImage && <AnnotatedImage />}
+              {showAnnotation && <AnnotatedImage />}
             </main>
 
             {(isInClassifySection || isInAnswerRevealSection) && (
@@ -274,7 +293,12 @@ export default function Home({}: {}) {
               </RadioGroup>
             )}
 
-            {showImage && <div className={"text-3xl"}>{answerMessage}</div>}
+            {showAnnotation && (
+              <>
+                <div className={"text-3xl"}>{answerMessage}</div>
+                <AnswerResultTable/>
+              </>
+            )}
             <div className={"mt-8"}>{nextButton}</div>
           </Pane>
         )}
@@ -282,3 +306,12 @@ export default function Home({}: {}) {
     </>
   );
 }
+
+const gridAnswerJsonPath = path.join(process.cwd(), "/pages/gridAnswer.json");
+
+export const getStaticProps: GetStaticProps = async () => {
+  const gridAnswer = JSON.parse(fs.readFileSync(gridAnswerJsonPath, "utf-8"));
+  return {
+    props: { gridAnswer },
+  };
+};

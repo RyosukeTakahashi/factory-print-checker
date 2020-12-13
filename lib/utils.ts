@@ -34,7 +34,7 @@ export const getNextImagePath = async (targetPath) => {
   const storage = firebase.storage();
   const listResultDateFolder = await storage.ref().child(targetPath).listAll();
   const prefixes = listResultDateFolder.prefixes;
-  //以下で、フォルダーをひとつ選んでいるが、フォルダーによって格納されている画像の数が違うため、全てのフォルダの画像をリストしてflattenが必要化。
+  //画像を選ぶ差異、日付フォルダーによって格納されている画像の数が違うため、全てのフォルダの画像をリストしてflattenが必要化。
   const folderRefsArray = await Promise.all(
     prefixes.map((folderRef) => folderRef.listAll())
   );
@@ -75,12 +75,9 @@ const accumulatedClassesCorrectness = (
     }, {});
 };
 
-const getAnswerGridFromPixels = (pixels: [number, number][]) => {
-  const gridLength = 4;
-  const pixelPerGrid = 512 / gridLength;
-  const answers = pixels.map((pixel) => [
-    Math.ceil(pixel[0] / pixelPerGrid),
-    Math.ceil(pixel[1] / pixelPerGrid),
-  ]);
-  return answers
+export const getCorrectGrids = (gridAnswer, path) => {
+  const imgKey = path.replace("printer_test/target", "");
+  return gridAnswer[imgKey]
+    .map((grid) => (grid[0] - 1) * 4 + grid[1])
+    .sort((a, b) => a - b);
 };

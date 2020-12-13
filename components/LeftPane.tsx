@@ -33,9 +33,10 @@ import {
   targetImgUrlAtom,
   questionOrderInSessionAtom,
   memoAtom,
+  imgPathAtom,
 } from "../src/atoms";
 import * as React from "react";
-import { getNextImagePath } from "../lib/utils";
+import { getCorrectGrids, getNextImagePath } from "../lib/utils";
 import firebase from "../firebase/clientApp";
 import { getAnswers } from "../src/fetchers";
 
@@ -67,6 +68,7 @@ export default function LeftPane() {
   const setCorrectClass = useSetRecoilState(correctClassAtom);
   const setTargetImgUrl = useSetRecoilState(targetImgUrlAtom);
   const setLabelImgUrl = useSetRecoilState(labelImgUrlAtom);
+  const setImgPath = useSetRecoilState(imgPathAtom);
   const setSessionStartedTime = useSetRecoilState(sessionStartedTimeAtom);
   const [questionOrderInSession, setQuestionOrderInSession] = useRecoilState(
     questionOrderInSessionAtom
@@ -89,6 +91,7 @@ export default function LeftPane() {
     const imgUrls = await getNextImagePath(targetPath);
     setTargetImgUrl(imgUrls.target);
     setLabelImgUrl(imgUrls.label);
+    setImgPath(imgUrls.path);
     setSessionStartedTime(firebase.firestore.Timestamp.now());
     setStarted(true);
     setStartedTime(firebase.firestore.Timestamp.now());

@@ -80,3 +80,4 @@ const CheckBoxOption: FC<checkBoxOption> = (props: {
     </div>
   );
 };
+

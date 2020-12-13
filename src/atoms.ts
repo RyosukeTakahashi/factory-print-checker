@@ -77,6 +77,26 @@ export const correctClassAtom = atom({
   default: "hige",
 });
 
+export const correctGridsAtom = atom({
+  key: "correctGrids",
+  default: [],
+});
+
+export const truePositiveGridsAtom = atom({
+  key: "truePositive",
+  default: [],
+});
+
+export const falsePositiveGridsAtom = atom({
+  key: "falsePositive",
+  default: [],
+});
+
+export const falseNegativeGridsAtom = atom({
+  key: "falseNegative",
+  default: [],
+});
+
 export const subjectIdAtom = atom({
   key: "subjectId",
   default: "0",
@@ -114,6 +134,11 @@ export const targetImgUrlAtom = atom({
 
 export const labelImgUrlAtom = atom({
   key: "labelImgUrls",
+  default: "http://placehold.jp/150x150.png",
+});
+
+export const imgPathAtom = atom({
+  key: "imgPath",
   default: "http://placehold.jp/150x150.png",
 });
 
