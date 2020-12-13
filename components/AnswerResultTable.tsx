@@ -13,8 +13,12 @@ export const AnswerResultTable: FC = () => {
   const setFalsePositiveGrids = useSetRecoilState(falsePositiveGridsAtom);
   const setFalseNegativeGrids = useSetRecoilState(falseNegativeGridsAtom);
 
-  const correctGrids = new Set(useRecoilValue(correctGridsAtom));
-  const clickedAreas = new Set(useRecoilValue(clickedAreasAtom));
+  const correctGridsArray = useRecoilValue(correctGridsAtom);
+  const clickedAreasArray = useRecoilValue(clickedAreasAtom);
+
+  const correctGrids = new Set(correctGridsArray);
+  const clickedAreas = new Set(clickedAreasArray);
+
   //正解かつ選ばれた
   const truePositive = new Set(
     // @ts-ignore
@@ -54,7 +58,7 @@ export const AnswerResultTable: FC = () => {
     setFalsePositiveGrids([...falsePositive]);
     // @ts-ignore
     setFalseNegativeGrids([...falseNegative]);
-  }, []);
+  }, [clickedAreasArray]);
 
   return (
     <>

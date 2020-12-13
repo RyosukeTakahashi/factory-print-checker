@@ -3,6 +3,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import {
   clickedAreasAtom,
   gridLengthAtom,
+  isInGridSectionAtom,
   targetImgUrlAtom,
 } from "../src/atoms";
 
@@ -28,7 +29,10 @@ export default function Squares({}: {}) {
   const gridLength = useRecoilValue(gridLengthAtom);
   const imgUrl = useRecoilValue(targetImgUrlAtom);
   const [clickedAreas, setClickedAreas] = useRecoilState(clickedAreasAtom);
+  const isInGridSection = useRecoilValue(isInGridSectionAtom);
+
   const handleOnClick = (nthGrid) => () => {
+    if (!isInGridSection) return;
     const newClickedAreas = (() => {
       if (!clickedAreas.includes(nthGrid)) {
         return clickedAreas.concat([nthGrid]);
@@ -36,7 +40,7 @@ export default function Squares({}: {}) {
         return clickedAreas.filter((element) => element !== nthGrid);
       }
     })();
-    setClickedAreas(newClickedAreas);
+    setClickedAreas(newClickedAreas.sort((a, b) => a - b));
   };
 
   const areas = Array.from({ length: gridLength }).map((_, i) => {

@@ -56,8 +56,6 @@ import fs from "fs";
 import { GetStaticProps } from "next";
 import { AnswerResultTable } from "../components/AnswerResultTable";
 
-//todo: 正解不正解を判断する
-//todo: 正解箇所に応じて混合行列表示してあげる
 //余裕あれば: background image preload, css multiple background, content-url。
 //余裕あれば: firebaseプロジェクト作成
 //余裕あれば: アカウントに画像アップロード
