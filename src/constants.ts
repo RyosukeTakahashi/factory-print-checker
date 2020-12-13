@@ -47,6 +47,9 @@ export const csvHeaders = [
   { label: "subjectId", key: "subjectId" },
   { label: "clickedAreas", key: "clickedAreas" },
   { label: "correctGrids", key: "correctGrids" },
+  { label: "truePositiveGrids", key: "truePositiveGrids" },
+  { label: "falsePositiveGrids", key: "falsePositiveGrids" },
+  { label: "falseNegativeGrids", key: "falseNegativeGrids" },
   { label: "userChosenClass", key: "userChosenClass" },
   { label: "correctClass", key: "correctClass" },
   { label: "chosenClassCorrect", key: "chosenClassCorrect" },
@@ -80,6 +83,9 @@ export const cleanseData = (dataArray: firebase.firestore.DocumentData[]) => {
       sessionData.sessionSetStartedTime.nanoseconds * 10 ** -9;
     const clickedAreas = String(sessionData.clickedAreas);
     const correctGrids = String(sessionData.correctGrids);
+    const truePositiveGrids = String(sessionData.truePositiveGrids);
+    const falsePositiveGrids = String(sessionData.falsePositiveGrids);
+    const falseNegativeGrids = String(sessionData.falseNegativeGrids);
     return Object.assign(sessionData, {
       areaPickedTime,
       classPickedTime,
@@ -87,6 +93,9 @@ export const cleanseData = (dataArray: firebase.firestore.DocumentData[]) => {
       sessionSetStartedTime,
       clickedAreas,
       correctGrids,
+      truePositiveGrids,
+      falsePositiveGrids,
+      falseNegativeGrids
     });
   });
 };
