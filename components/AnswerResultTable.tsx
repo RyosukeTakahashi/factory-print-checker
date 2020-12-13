@@ -1,11 +1,20 @@
-import React, { FC } from "react";
-import { useRecoilValue } from "recoil";
-import { clickedAreasAtom, correctGridsAtom } from "../src/atoms";
+import React, { FC, useEffect } from "react";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import {
+  clickedAreasAtom,
+  correctGridsAtom,
+  falseNegativeGridsAtom,
+  falsePositiveGridsAtom,
+  truePositiveGridsAtom,
+} from "../src/atoms";
 
 export const AnswerResultTable: FC = () => {
+  const setTruePositiveGrids = useSetRecoilState(truePositiveGridsAtom);
+  const setFalsePositiveGrids = useSetRecoilState(falsePositiveGridsAtom);
+  const setFalseNegativeGrids = useSetRecoilState(falseNegativeGridsAtom);
+
   const correctGrids = new Set(useRecoilValue(correctGridsAtom));
   const clickedAreas = new Set(useRecoilValue(clickedAreasAtom));
-
   //正解かつ選ばれた
   const truePositive = new Set(
     // @ts-ignore
@@ -37,6 +46,15 @@ export const AnswerResultTable: FC = () => {
       return "マス：不正解です。";
     }
   };
+
+  useEffect(() => {
+    // @ts-ignore
+    setTruePositiveGrids([...truePositive]);
+    // @ts-ignore
+    setFalsePositiveGrids([...falsePositive]);
+    // @ts-ignore
+    setFalseNegativeGrids([...falseNegative]);
+  }, []);
 
   return (
     <>

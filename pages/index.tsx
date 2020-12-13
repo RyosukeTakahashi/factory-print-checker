@@ -16,6 +16,8 @@ import {
   clickedAreasAtom,
   correctClassAtom,
   correctGridsAtom,
+  falseNegativeGridsAtom,
+  falsePositiveGridsAtom,
   imgPathAtom,
   isInAnswerRevealSectionAtom,
   isInClassifySectionAtom,
@@ -33,6 +35,7 @@ import {
   startedAtom,
   subjectIdAtom,
   targetImgUrlAtom,
+  truePositiveGridsAtom,
   userChosenClassAtom,
 } from "../src/atoms";
 import { saveAnswerData } from "../src/fetchers";
@@ -51,7 +54,7 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import path from "path";
 import fs from "fs";
 import { GetStaticProps } from "next";
-import {AnswerResultTable} from "../components/AnswerResultTable";
+import { AnswerResultTable } from "../components/AnswerResultTable";
 
 //todo: 正解不正解を判断する
 //todo: 正解箇所に応じて混合行列表示してあげる
@@ -90,6 +93,9 @@ export default function Home({ gridAnswer }) {
   );
   const [correctClass, setCorrectClass] = useRecoilState(correctClassAtom);
   const [correctGrids, setCorrectGrids] = useRecoilState(correctGridsAtom);
+  const truePositiveGrids = useRecoilValue(truePositiveGridsAtom);
+  const falsePositiveGrids = useRecoilValue(falsePositiveGridsAtom);
+  const falseNegativeGrids = useRecoilValue(falseNegativeGridsAtom);
   const [userChosenClass, setUserChosenClass] = useRecoilState(
     userChosenClassAtom
   );
@@ -139,6 +145,9 @@ export default function Home({ gridAnswer }) {
       userChosenClass,
       correctClass,
       correctGrids,
+      truePositiveGrids,
+      falsePositiveGrids,
+      falseNegativeGrids,
       maxSessionCount,
       chosenClassCorrect,
       sessionSetStartedTime,
@@ -296,7 +305,7 @@ export default function Home({ gridAnswer }) {
             {showAnnotation && (
               <>
                 <div className={"text-3xl"}>{answerMessage}</div>
-                <AnswerResultTable/>
+                <AnswerResultTable />
               </>
             )}
             <div className={"mt-8"}>{nextButton}</div>
