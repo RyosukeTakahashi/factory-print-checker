@@ -213,11 +213,6 @@ export default function Home({}: {}) {
             setClassPickedTime(firebase.firestore.Timestamp.now());
             setIsInClassifySection(false);
             setIsInAnswerRevealSection(true);
-            // if (showAnswer === "true") {
-            //   setIsInAnswerRevealSection(true);
-            // } else {
-            //   moveToNextStep().then(() => {});
-            // }
           }}
         >
           選択した分類で回答する
